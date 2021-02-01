@@ -2,6 +2,8 @@ from Apriori import Apriori
 from FPGrowth import FPGrowth
 import os
 import pandas as pd
+import numpy as np
+import csv
 
 def call_apriori(filePath,minSuppCount,minConfidence):
     ap = Apriori(minSuppCount,minConfidence)
@@ -23,22 +25,66 @@ def call_fpGrowth(filePath,minSuppCount,minConfidence):
         else:
             print('Invalid choice!')
 
+def getInput():
+    temp = ""
+    transRecord = []
+    print('Please enter the transaction records (enter ''''quit'''' to stop the input)')
+    while True:
+        temp = input()
+        if temp == 'quit':
+            break
+        transRecord.append(temp)
+    return transRecord
+
+def saveInput(transRecord):
+    transArray = []
+    for row in transRecord:
+    #     print(row.split(','))
+        transArray.append(np.asarray(row.split(',')))
+    a = np.asarray(transArray,dtype=object)
+    # a.shape
+    while True:
+        print('Enter file name to save (.csv): ')
+        filePath = str(input())
+        if (not os.path.exists(filePath)):
+            break
+        else:
+            print('File exits! Please try another name')    
+    with open(filePath, "w", encoding = "utf-8") as f:
+        w = csv.writer(f)
+        w.writerows(transArray)
+    return filePath
 
 print ('{:=^40}'.format(f' Welcome to frequent pattern analysis tools '))
 
-filePath = 'food.csv'
-minConfidence = 0.8
+filePath = 'monkey.csv'
+minConfidence = 0.5
 minSuppCount = 2
-
+# call_apriori(filePath,minSuppCount,minConfidence)
+# call_fpGrowth(filePath,minSuppCount,minConfidence)
 while True:
-
     while True:
-        print('Enter file path (.csv): ')
-        filePath = str(input())
-        if (os.path.exists(filePath)):
+        print('Select a input method')
+        print('1) File (.csv)')
+        print('2) Manual')
+        choice = int(input())
+        if (choice >= 1 and choice <= 2):
             break
         else:
-            print('File does not exits')
+            print('Invalid choice!')       
+
+    if choice == 1:
+        while True:
+            print('Enter file path (.csv): ')
+            filePath = str(input())
+            if (os.path.exists(filePath)):
+                break
+            else:
+                print('File does not exits')
+    elif choice == 2:
+        transRecord = getInput()
+        filePath = saveInput(transRecord)     
+        
 
     while True:
         print('Enter confidence threshold: (0.0 - 1.0):')
