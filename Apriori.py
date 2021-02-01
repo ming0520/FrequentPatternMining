@@ -247,10 +247,11 @@ class Apriori:
         print('')
         self.generateRules()
         self.displayStrongRules()
-        # try:
-
-        # except:
-            # print('\nNo strong rule\n')
+        try:
+            self.generateRules()
+            self.displayStrongRules()
+        except:
+            print('\nNo strong rule\n')
         # try:
         #     rulesSet = self.associationRule()
         #     threeItemsetAbove, rulesSet = self.associationRule()
