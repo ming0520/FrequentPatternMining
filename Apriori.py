@@ -8,6 +8,9 @@ class ARule:
         self.l = l
         self.sn = sn
         self.ln = ln
+        
+    def getConfidence(self):
+        return self.ln/self.sn
 
 class Apriori:
     def __init__(self,minSuppCount = 2,minConfidence=0.5):
@@ -178,6 +181,35 @@ class Apriori:
                     print(f'{rule.s} => {rule.l} confidence={rule.ln}/{rule.sn} = {percentage}\n')    
                 print('\n')
         print ('{:-^40}'.format(f' End strong rule'))
+
+    def generateRules(self):
+        strongRules = []
+        for frequentPattern in self.frequentPattern[2:]:
+            itemset = frequentPattern[0]
+            itemsetCount = frequentPattern[1]
+            for item in itemset:
+                if(len(item) < 2):
+                    continue
+                ln = itemsetCount[self.getKey(item)]
+#                 print(f'------{item}: {itemsetCount[self.getKey(item)]}-----')
+                subsets = self.powerset(item)
+                for subset in subsets:
+                    sn = self.calculateMinSuppCount(subset)
+                    s=subset
+                    l=np.setdiff1d(item,subset)
+#                     print(f'{subset}=>{l}')
+                    associationRule = ARule(s,l,sn,ln)
+                    strongRules.append(associationRule)
+        self.strongRules = strongRules
+        
+    def displayAllRules(self):        
+        for strongRule in self.strongRules:
+            print(f'{strongRule.s}=>{strongRule.l} confidence={strongRule.ln}/{strongRule.sn}={strongRule.getConfidence():.2f} support count = {strongRule.ln}')
+            
+    def displayStrongRules(self):        
+        for strongRule in self.strongRules:
+            if(strongRule.ln >= self.minSuppCount and strongRule.getConfidence()*100 >= self.minConfidence):
+                print(f'{strongRule.s}=>{strongRule.l} confidence={strongRule.ln}/{strongRule.sn}={strongRule.getConfidence()*100:.2f} support count = {strongRule.ln}')
     
     def process(self,file):
         print ('{:=^40}'.format(f' Start of apriori '))
@@ -213,11 +245,17 @@ class Apriori:
         print('')
         print ('{:-^40}'.format(f' Strong Rule '))
         print('')
-        try:
-            rulesSet = self.associationRule()
-            threeItemsetAbove, rulesSet = self.associationRule()
-            self.displayRules(threeItemsetAbove,rulesSet)
-        except:
-            print('\nNo strong rule\n')
+        self.generateRules()
+        self.displayStrongRules()
+        # try:
+
+        # except:
+            # print('\nNo strong rule\n')
+        # try:
+        #     rulesSet = self.associationRule()
+        #     threeItemsetAbove, rulesSet = self.associationRule()
+        #     self.displayRules(threeItemsetAbove,rulesSet)
+        # except:
+        #     print('\nNo strong rule\n')
         print('\n')
         print ('{:=^40}'.format(f' End of apriori '))
