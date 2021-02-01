@@ -412,13 +412,13 @@ class FPGrowth:
         return minSuppCount
     
     def generateStrongRule(self,itemTbl,isLargestK=True):
-        largestK = 0
-        if isLargestK:
-            for item in itemTbl:
-                frequentPatterns=item.FP
-                for frequentPattern in frequentPatterns:
-                    largestK = max(largestK,len(frequentPattern[0]))
-            print(f'Largest k is {largestK}')
+        # largestK = 0
+        # if isLargestK:
+        #     for item in itemTbl:
+        #         frequentPatterns=item.FP
+        #         for frequentPattern in frequentPatterns:
+        #             largestK = max(largestK,len(frequentPattern[0]))
+        #     print(f'Largest k is {largestK}')
 
         for item in itemTbl:
 #             print(f'==={item.name}===')
@@ -426,8 +426,8 @@ class FPGrowth:
             for frequentPattern in frequentPatterns:
                 itemset = frequentPattern[0]
                 ln = frequentPattern[1]
-                if(len(itemset)!=largestK and isLargestK):
-                    continue
+                # if(len(itemset)!=largestK and isLargestK):
+                #     continue
 #                 print(frequentPattern)
                 subsets = self.powerset(itemset,1)
                 item
@@ -446,7 +446,12 @@ class FPGrowth:
             print(f'{item.name}:{item.count}')
     
     def displayFPTree(self,root):
-        print(RenderTree(root))
+        # print(RenderTree(root))
+        for pre, _, node in RenderTree(root):
+            if node.name == 'null':
+                print("%s%s" % (pre, node.name))
+            else:
+                print("%s%s: %s" % (pre, node.name, node.count))
         
     def displayConditionalPatternBase(self,itemTbl):
         for item in itemTbl:
@@ -462,7 +467,8 @@ class FPGrowth:
     def displayConditionalFPTree(self,itemTbl):            
         for item in itemTbl:
             print(f'==={item.name}===')
-            print(RenderTree(item.CFPTree))
+            self.displayFPTree(item.CFPTree)
+            # print(RenderTree(item.CFPTree))
             print('\n')
             
     def displayFrequentPatternGenerated(self,itemTbl):      
@@ -497,7 +503,7 @@ class FPGrowth:
                 confidence = ln/sn
                 if confidence < self.minConfidence:
                     continue
-                print(f'{s}=>{l} confidence = {ln}/{sn} = {confidence}')
+                print(f'{s}=>{l} confidence = {ln}/{sn} = {confidence} support count = {ln}')
                 
     def to_df(self,itemTbl):          
 #         print('Item|||Conditional Pattern Base|||Conditional FP-tree')
@@ -549,7 +555,7 @@ class FPGrowth:
         self.displayFPTree(fptree)
         print('\n')
         itemTbl = self.reverseName(itemTbl)
-        itemTbl = self.filterCPBase(itemTbl)
+        # itemTbl = self.filterCPBase(itemTbl)
         itemTbl = self.generateCPBase(itemTbl)
         print('Conditional Pattern Base:')
         self.displayConditionalPatternBase(itemTbl)
